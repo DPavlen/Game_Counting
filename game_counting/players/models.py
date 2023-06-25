@@ -59,13 +59,13 @@ class Game(models.Model):
                           primary_key=True)
     url = models.CharField(verbose_name="URL игры",
                                   max_length=255)
-    ledger = models.CharField(verbose_name="??????",
+    ledger = models.CharField(verbose_name="расчеты",
                                      max_length=255, null=True, blank=True)
     picture = models.ImageField(blank=True)
 
 
     def __str__(self):
-        return self.url
+        return f'Url игры: {self.url}'
 
     class Meta:
         verbose_name = "Игра"
@@ -79,16 +79,22 @@ class Game(models.Model):
 class Payment(models.Model):
     """Модель оплаты. Основные атрибуты и функции."""
 
-    id = models.AutoField(verbose_name="идентификатор игры",
+    id = models.AutoField(verbose_name="идентификатор оплаты",
                           primary_key=True)
     game = models.ForeignKey(
-        Game, on_delete=models.CASCADE, related_name='Игра'
+        Game, on_delete=models.CASCADE,
+        verbose_name='Ссылка Игра', related_name='Игра'
     )
-    payer = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name='Игрок'
+    player = models.ForeignKey(
+        Player, on_delete=models.CASCADE, 
+        verbose_name='Игрок', 
+        null=True, blank=True
     )
     recipient = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name='Players'
+        Player, on_delete=models.CASCADE,
+        verbose_name='Получатель', related_name='Player',
+        null=True, blank=True
+        
     )
     value = models.FloatField(verbose_name="Значение суммы платежа",
                              max_length=30, null=True, blank=True)
@@ -99,7 +105,7 @@ class Payment(models.Model):
     
 
     def __str__(self):
-        return self.id
+        return f'Оплата № {self.id}'
 
     class Meta:
         verbose_name = "Оплата"
@@ -119,20 +125,31 @@ class Payment(models.Model):
 
 
 class Team(models.Model):
-    """Модель оплаты. Основные атрибуты и функции."""
+    """Модель команды. Основные атрибуты и функции."""
 
     id = models.AutoField(verbose_name="идентификатор команды",
                           primary_key=True)
-    # list[Player] for player??
-    players = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name='players'
+
+    # list[Player] for player?? Many Many
+    players = models.ManyToManyField(
+        Player, verbose_name="Основное имя игрока",
+        related_name='players'
     )
-    admin = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name='admin'
+     # list[admin]  Many Many
+    admin = models.ManyToManyField(
+        Player,
+        related_name='administrator'
     )
+    game = models.ManyToManyField(
+        Game, verbose_name="URL игры",
+        related_name='games'
+    )
+    # game (One to Many????)
+    # игра (у одной команды может быть несколько игр)
     
     def __str__(self):
-        return self.url
+        return f'Команда № {self.id}'
+
 
     class Meta:
         verbose_name = "Команда"
