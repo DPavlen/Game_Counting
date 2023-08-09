@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'players.apps.PlayersConfig',
+    'players',
+    # 'players.apps.PlayersConfig',
+    # python manage.py bot
+    # 'bot', 
 ]
 
 MIDDLEWARE = [
